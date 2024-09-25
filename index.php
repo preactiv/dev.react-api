@@ -20,13 +20,14 @@ foreach ($requests as $ip_address => $data) {
     }
 }
 
-// Honeypot field check to catch bots
-if (!empty($_POST['contact_message'])) {
-    // If the honeypot field is filled, it's likely a bot
-    http_response_code(403); // Forbidden
+// Honeypot field check to catch bots (renamed the field)
+if (!empty($_POST['hidden_address_field'])) {
+    // Honeypot filled indicates bot
+    http_response_code(403);
     echo json_encode(["status" => "fail", "reason" => "bot_detected"]);
     exit();
 }
+
 
 // Mouse movement check
 if ($_POST['mouse_movement'] === 'bot') {
@@ -384,12 +385,38 @@ if (isset($requests[$ip])) {
         <!-- Honeypot field to catch bots (hidden from users) -->
         <form method="post">
             <input type="hidden" name="mouse_movement" id="mouse-movement" value="human" />
-            <input type="text" name="contact_message" class="ant-bot" /> <!-- Honeypot field -->
+            <input type="text" name="hidden_address_field" class="ant-bot" /> <!-- Honeypot field -->
             <button type="submit" style="display:none;">Submit</button>
         </form>
         
         
     </div>
+	<script>
+	window.onload = function() {
+    let hasMovedMouse = false;
+    let movements = 0;
+
+    // Track mouse movements and events over time
+    window.addEventListener('mousemove', function() {
+        hasMovedMouse = true;
+        movements++;
+    });
+
+    window.addEventListener('click', function() {
+        movements++;
+    });
+
+    // On form submission
+    document.querySelector('form').onsubmit = function(event) {
+        if (!hasMovedMouse || movements < 5) {
+            document.getElementById('mouse-movement').value = 'bot';
+        } else {
+            document.getElementById('mouse-movement').value = 'human';
+        }
+    };
+};
+</script>
+	
     <!-- Your visible landing page ends here -->
 </body>
 </html>
