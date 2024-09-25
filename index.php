@@ -30,11 +30,14 @@ if (!empty($_POST['hidden_address_field'])) {
 
 
 // Mouse movement check
-if ($_POST['mouse_movement'] === 'bot') {
-    http_response_code(403); // Forbidden
-    echo json_encode(["status" => "fail", "reason" => "no_mouse_interaction_detected"]);
-    exit();
+if (isset($_POST['mouse_movement'])) {
+    $mouse_movement = $_POST['mouse_movement'];
+    // Process the mouse movement data here
+} else {
+    // Handle the case where mouse movement data is not sent
+    $mouse_movement = null; // Or take appropriate action
 }
+
 
 // User-Agent check
 $user_agent = $_SERVER['HTTP_USER_AGENT'];
